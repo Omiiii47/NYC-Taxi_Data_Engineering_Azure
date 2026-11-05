@@ -34,14 +34,14 @@ flowchart LR
 
 The `WebToDateLake` pipeline is **parameterized** so that a single pipeline handles all 12 monthly files instead of 12 separate copy activities. A **ForEach** activity loops over the list of files, and an **If Condition** activity controls the copy logic inside the loop. Files land in the `bronze` container of the storage account. A **scheduled trigger** runs the pipeline automatically.
 
-### 2. Bronze to Silver (`silver_notebook.py`)
+### 2. Bronze to Silver (`databricks/silver_notebook.py`)
 
 - Reads the zone lookup CSV and the trip Parquet files from bronze using an **explicit schema** (21 columns, including `lpep_pickup_datetime`, `PULocationID`, `DOLocationID`, `fare_amount`, `total_amount`).
 - Splits the `Zone` column into `Zone1` and `Zone2` on the `/` separator and trims whitespace.
 - Derives date attributes from the pickup timestamp (`trip_date`, `trip_year`, `trip_month`, `trip_day`).
 - Selects the required trip columns and writes Parquet to the `silver` container.
 
-### 3. Silver to Gold (`gold_notebook.py`)
+### 3. Silver to Gold (`databricks/gold_notebook.py`)
 
 - Creates the Unity Catalog catalog `nyc_catalog` with managed storage in the `gold` container, and the schema `nyc_catalog.gold`.
 - Writes two Delta tables:
