@@ -1,6 +1,6 @@
 # NYC Taxi Data Engineering Pipeline
 
-An end-to-end batch data pipeline on Azure that ingests NYC green taxi trip data for 2025, transforms it through a **medallion architecture** (bronze, silver, gold) with PySpark, stores curated data as **Delta tables in Unity Catalog**, and serves it to **Power BI**.
+An end-to-end batch data pipeline on Azure that ingests NYC green taxi trip data for 2025, transforms it through a **medallion architecture** (bronze, silver, gold) with PySpark, stores curated data as **Delta tables in Unity Catalog**, and connects **Power BI Desktop** to those tables.
 
 ## Architecture
 
@@ -20,7 +20,7 @@ flowchart LR
 | Storage | Azure Data Lake Storage Gen2 (`bronze`, `silver`, `gold` containers) |
 | Processing | Azure Databricks, PySpark |
 | Table format and governance | Delta Lake, Unity Catalog |
-| Reporting | Power BI Desktop (via Databricks SQL) |
+| Reporting | Power BI Desktop connected to the Databricks SQL warehouse (connection only, no report built yet) |
 
 ## Data Source
 
@@ -48,9 +48,9 @@ The `WebToDateLake` pipeline is **parameterized** so that a single pipeline hand
   - `nyc_catalog.gold.trip_zone`
   - `nyc_catalog.gold.trip_2025_data`
 
-### 4. Reporting (Power BI)
+### 4. Connection to Power BI
 
-Power BI Desktop connects to the gold tables through the Azure Databricks connector, so the Delta tables can be queried and modeled for reporting.
+Power BI Desktop is connected to the workspace through the Azure Databricks connector, so the gold Delta tables are reachable from Power BI. This step covers the **connection setup only** - no dashboard or report has been built on top of it yet.
 
 ## Repository Structure
 
@@ -59,7 +59,7 @@ Power BI Desktop connects to the gold tables through the Azure Databricks connec
 ├── databricks/
 │   ├── silver_notebook.py    # Bronze -> Silver transformations
 │   └── gold_notebook.py      # Silver -> Gold Delta tables in Unity Catalog
-├── images/                   # Screenshots (pipeline, data fetching)
+├── images/                   # Screenshots (ADF pipeline, data fetching, Power BI connection)
 ├── taxi_zone_lookup.csv      # TLC taxi zone lookup
 └── README.md
 ```
@@ -80,6 +80,8 @@ Power BI Desktop connects to the gold tables through the Azure Databricks connec
 
 ![Successful Data Fetching](images/Successfull_data_fetching.png)
 
+![Power BI connected to Databricks](images/connected_to_powerBI_and_databrics.png)
+
 ## Possible Improvements
 
 - Keep the date, distance, tip, and payment columns in the silver layer to enable time-based analysis.
@@ -88,6 +90,7 @@ Power BI Desktop connects to the gold tables through the Azure Databricks connec
 - Chain the Databricks notebooks into the ADF pipeline or a Databricks Job for fully automated bronze-to-gold runs.
 - Add aggregated gold tables (daily revenue, trips by zone, average fare by hour).
 - Replace personal access tokens with Microsoft Entra ID (OAuth) authentication.
+- Build a Power BI report/dashboard on the connected gold tables.
 
 ## Author
 
